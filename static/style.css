@@ -1,1 +1,111 @@
-/* Styling */
+:root {
+    --bg-color: #F7FAFC;
+    --accent-color: #61A6D4;
+    --primary-text-color: #292A2C;
+    --secondary-text-color: #61A6D4;
+    --tertiary-text-color: #84878B;
+    --quaternary-text-color: #F7FAFC;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    font-family: 'Source Sans Pro', Arial, Helvetica, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--primary-text-color);
+    position: relative;
+}
+
+.navbar-container {
+    height: 4rem;
+    background-color: var(--accent-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: var(--quaternary-text-color);
+}
+
+.content {
+    height: calc(100vh - 4rem);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    width: 26.5rem;
+    height: 32.5rem;
+    background-color: #FCFCFC;
+    border: 1px solid #E1E3E4;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-content {
+    width: 85%;
+    height: 85%; 
+}
+
+.login-title {
+    width: 100%;
+    margin: 0;
+    text-align: center;
+}   
+
+.login-form {
+    width: 100%;
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;   
+    gap: .5rem;
+}
+
+.login-form label,
+.login-form input {
+    display: block;
+}
+
+.login-form input {
+    height: 3rem;
+    padding: 0 1rem;
+    border-radius: .5rem;
+    border: 1px solid #E1E3E4;
+    font-family: 'Source Sans Pro', Arial, Helvetica, sans-serif;
+    font-size: 1rem;
+    background-color: #FCFCFC;
+    color: var(--primary-text-color);
+}
+
+.login-form input:not(:last-child) {
+    margin-bottom: 2rem;
+}
+
+.login-form input:focus {
+    outline-color: var(--accent-color);
+}
+
+.login-form input[type="submit"] {
+    border: none;
+    background-color: var(--accent-color);
+    color: var(--quaternary-text-color);
+}
+
+.login-form input[type="submit"]:hover {
+    cursor: pointer;
+    background-color: #4E91BD;
+}
+
+.footer-container {
+    width: inherit;
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+}
