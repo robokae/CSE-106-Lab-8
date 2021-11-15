@@ -7,9 +7,14 @@ app = Flask(__name__)
 # def base():
 #     return render_template("base.html")
 
-@app.route("/")
+@app.route("/", methods = ["POST", "GET"])
 def login():
-    return render_template("login.html")
+    if request.method == "POST":
+        user = request.form["username"]
+        password = request.form["password"]
+        return redirect(url_for("student", name = user))
+    else:
+        return render_template("login.html")
 
 @app.route("/student/<name>")
 def student(name):
