@@ -1,0 +1,29 @@
+{% extends "person.html" %}
+
+{% block title %}{{ instructor_course }}{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'instructor.css') }}">
+{% endblock %}
+
+{% block person_name %}{{ instructor_name }}{% endblock %}
+
+{% block inner_nav_links %} 
+    <p class="inner-nav-link active-tab">{{ instructor_course }} Gradebook</p>
+{% endblock %}
+
+{% block data_table_headings %} 
+    <th>Student</th>
+    <th>Grade</th>
+{% endblock %}
+
+{% block data_table_body %}
+    {% for student in data %}
+        <tr>
+            <td>{{ student.name }}</td>
+            <td>{{ student.grade }}</td>
+        </tr>
+    {% endfor %}
+{% endblock %}

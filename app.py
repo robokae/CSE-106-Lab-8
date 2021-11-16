@@ -74,6 +74,29 @@ sample_instructor_data = [
     }
 ]
 
+sample_instructor_course_data = [
+    {
+        'name': 'John Smith',
+        'grade': 93
+    },
+    {
+        'name': 'Alice Jones',
+        'grade': 94
+    },
+    {
+        'name': 'Mary Chen',
+        'grade': 95
+    },
+    {
+        'name': 'David',
+        'grade': 96
+    },
+    {
+        'name': 'Santosh',
+        'grade': 97
+    }
+]
+
 @app.route("/")
 def login():
     return render_template("login.html")
@@ -86,7 +109,14 @@ def student(name):
 @app.route("/instructor/<name>")
 def instructor(name):
     instructor_name = name
-    return render_template("instructor.html", instructor_name = instructor_name)
+    return render_template("instructor.html", instructor_name = instructor_name, data = sample_instructor_data)
+
+@app.route("/instructor/<name>/<course>")
+def specific_course(name, course):
+    instructor_name = name
+    instructor_course = course
+
+    return render_template("specificCourse.html", instructor_name = instructor_name, instructor_course = instructor_course, data = sample_instructor_course_data)
 
 @app.route("/enrolled/<name>")
 def enrolled(name):

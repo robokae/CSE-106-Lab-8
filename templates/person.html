@@ -24,13 +24,15 @@
             <table class="data-table">
                 <thead class="data-table-head">
                     <tr class="data-table-row headings-row">
-                        
+                        {% block data_table_headings %}{% endblock %}
                     </tr>
                 </thead>
                 <tbody class="data-table-body">
-                    
+                    {% block data_table_body %}{% endblock %}
                 </tbody>
             </table>
         </div>
     </div>
 {% endblock %}
+
+
