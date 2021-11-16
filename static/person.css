@@ -50,6 +50,7 @@
 
 .inner-nav-link {
     padding: .35rem .25rem;
+    text-decoration: none;
     border: none;
     background-color: transparent;
     font-family: 'Source Sans Pro', Arial, Helvetica, sans-serif;
@@ -65,7 +66,7 @@
     cursor: pointer;
 }
 
-.active-link {
+.active-tab {
     font-weight: 600;
     color: var(--secondary-text-color);
     border-bottom: 2px solid var(--accent-color);
@@ -81,18 +82,14 @@
     background-color: var(--accent-color);
 }
 
-.data-table-row {
-    
-}
-
-.data-table-row th,
-.data-table-row td {
+.data-table-row th {
     text-align: left;
     padding: 1rem 1rem;
 }
 
-.data-table-row td {
+.data-table-body td {
     color: var(--primary-text-color);
+    padding: 1rem 1rem;
 }
 
 .data-table-row:nth-child(odd):not(:first-child) {
