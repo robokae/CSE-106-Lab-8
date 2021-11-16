@@ -1,5 +1,6 @@
 # Main application code
 from flask import Flask, render_template, request, url_for, redirect
+from db import db, User, Teacher, Student, Course, Enrollment
 
 app = Flask(__name__)
 
@@ -33,7 +34,28 @@ def student(name):
         }
     ]
     student_name = name
+    # GOOD CODE AS FAR AS I KNOW, PROBLEM IS SQLALCHEMY AT THE MOMENT
+    # try_data = []
+    # stuQ = Student.query.filter_by(name=student_name).first()
+    # stuQC = stuQ.courses
+    # for i in range(len(stuQC)):
+    #     temp = {
+    #         'name':stuQC[i].course.course_name,
+    #         'instructor':stuQC[i].course.teacher.name,
+    #         'time':stuQC[i].course.time,
+    #         'enrollment':(str(stuQC[i].course.number_enrolled) + "/" + str(stuQC[i].course.capacity))
+    #     }
+    #     try_data.append(temp)
+    # print(try_data)
+    
+    # TESTING ERROR BLOCK OF CODE BELOW
+    # testdb = Student.query.all()
+    # print("------------------- STUDENTS -------------------")
+    # for student in testdb:
+	#     print(student.id, student.name, student.user, student.courses)
+    
     return render_template("student.html", student_name = student_name, data = sample_data)
+    # return render_template("student.html", student_name = student_name, data = try_data)
 
 @app.route("/instructor/<name>")
 def instructor(name):
