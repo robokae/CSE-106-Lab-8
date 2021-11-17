@@ -28,7 +28,7 @@
                 <p class="grade-value">{{ student.grade }}</p>
             </td>
             <td>
-                <form action="{{ url_for('specific_course', name = 'James', course = instructor_course, student = student.name ) }}" method="post">
+                <form action="{{ url_for('specific_course', name = instructor_name, course = instructor_course, student = student.name ) }}" method="post">
                     <input type="text" class="editable-field" name="new_grade" autocomplete="off">
                     <input class="edit-grade-submit" type="submit" value="Submit">
                 </form>
