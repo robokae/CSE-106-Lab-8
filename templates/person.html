@@ -10,9 +10,12 @@
     <div class="person-container">
         <div class="person-container-top">
             <h1 class="greeting">Welcome {% block person_name %}{% endblock %}</h1>
-            <div class="search-bar">
+            <!-- <div class="search-bar">
                 <i class="fas fa-search"></i>
                 <input type="text" placeholder="Search" autocomplete="off">
+            </div> -->
+            <div>
+                <a href="{{ url_for('logout') }}">Sign out</a>
             </div>
         </div>
         <div class="person-container-middle">

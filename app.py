@@ -34,7 +34,6 @@ admin.add_view(ModelView(Enrollment, db.session))
 
 # -------- Login ----------
 # LoginManager = instance of login
-
 login.login_view = 'login'
 
 @login.user_loader
