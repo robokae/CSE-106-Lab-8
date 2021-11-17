@@ -2,7 +2,7 @@
 from flask import Flask, render_template, request, url_for, redirect
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user, login_user
 from db import User, Teacher, Student, Course, Enrollment, db
 
 # from flask_admin import Admin, AdminIndexView
@@ -27,15 +27,14 @@ admin.add_view(ModelView(Enrollment, db.session))
 # -------- Login ----------
 # LoginManager = instance of login
 
-# login = LoginManager()
-# login.__init__app(app)
-# login.login_view = 'login'
+login = LoginManager(app)
+login.login_view = 'login'
 
-# app.config['SECRET_KEY'] = 'testkey'
+app.config['SECRET_KEY'] = 'testkey'
 
-# @login.user_loader
-# def load_user(user_id)for:
-#     return User.query.get(int(user_id))
+@login.user_loader
+def load_user(user_id):
+    return User.get_id(user_id)
 # -------------------------
 
 # @app.route("/")
@@ -69,29 +68,30 @@ admin.add_view(ModelView(Enrollment, db.session))
 @app.route("/", methods = ["POST", "GET"])
 def login():
 
-    # if current_user.is_authenticated:
-    #     return redirect(url_for('index'))
+        if request.method == 'POST':
+        # if current_user.is_authenticated:
+        #     if current_user.student_id is None:
+        #         return redirect(url_for('instructor'))
+        #     else:
+        #         return redirect(url_for('student'))
 
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-    
-        # checkUser = User.query.filter_by(username=username).first()
-        
+            username = request.form["username"]
+            password = request.form["password"]
 
-        # if not checkUser or not checkUser.check_password(password):
-        #         return render_template("login.html")
+            user = User.query.filter_by(username=username).first()
 
-    #     login_user(user)
+            if not user is None or not user.check_password(password):
+                    return redirect(url_for('login'))
 
-        return redirect(url_for("student", name = username))
+            login_user(user)
 
-    else:
-        return render_template("login.html")
+            if user.student_id is None:
+                redirect(url_for('instructor'))
+            else:
+                redirect(url_for('student'))
 
 
 # @app.route('/logout')
-# @login_required
 # def logout():
 #     logout_user
 

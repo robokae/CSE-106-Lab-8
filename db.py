@@ -17,6 +17,8 @@ class User(db.Model):
 	password = db.Column(db.String, nullable=False)
 	student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
 	teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'))
+	def check_password(self, password):
+		return self.password == password
 
 
 class Teacher(db.Model):
