@@ -14,6 +14,8 @@ def login():
         user = request.form["username"]
         password = request.form["password"]
         userQ = User.query.filter_by(username = user).first()
+        if type(userQ) is type(None):
+            return render_template("login.html")
         if userQ.student_id == None:
             nameQ = Teacher.query.filter_by(id = userQ.teacher_id).first()
             return redirect(url_for("instructor", name = nameQ.name))

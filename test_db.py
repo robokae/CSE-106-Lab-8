@@ -59,8 +59,15 @@ for i in range(len(teaAMC)):
 		print(teaAMC[i].students[j].grade)
 	print("")
 
-userName = "ahepworth"
+userName = "ahepwor"
 userNameQ = User.query.filter_by(username = userName).first()
-print(userNameQ.teacher_id)
-teachAm = Teacher.query.filter_by(id = userNameQ.teacher_id).first()
-print(teachAm.name)
+if type(userNameQ) is type(None):
+	print("No")
+else:
+	print(userNameQ.teacher_id)
+	teachAm = Teacher.query.filter_by(id = userNameQ.teacher_id).first()
+	print(teachAm.name)
+# userNameQ = User.query.filter_by(username = userName).first()
+# print(userNameQ.teacher_id)
+# teachAm = Teacher.query.filter_by(id = userNameQ.teacher_id).first()
+# print(teachAm.name)
