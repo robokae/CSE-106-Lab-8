@@ -1,31 +1,88 @@
 # Main application code
 from flask import Flask, render_template, request, url_for, redirect
-from db import db, User, Teacher, Student, Course, Enrollment, app
 
-# app = Flask(__name__)
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+from flask_login import LoginManager, current_user, login_user, login_required, logout_user
+from flask_sqlalchemy import SQLAlchemy
+from db import User, Teacher, Student, Course, Enrollment
+
+app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///example.sqlite"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+db = SQLAlchemy(app)
+
+# -------- Admin ----------
+admin = Admin(app)
+
+app.config['FLASK_ADMIN_SWATCH'] = 'Cyborg'
+
+admin.add_view(ModelView(User, db.session))
+admin.add_view(ModelView(Teacher, db.session))
+admin.add_view(ModelView(Student, db.session))
+admin.add_view(ModelView(Course, db.session))
+admin.add_view(ModelView(Enrollment, db.session))
+
+# -------- Login ----------
+# LoginManager = instance of login
+
+login = LoginManager(app)
+login.login_view = 'login'
+
+app.config['SECRET_KEY'] = 'testkey'
+
+@login.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
+
+
 
 # @app.route("/")
 # def base():
 #     return render_template("base.html")
 
+
 @app.route("/", methods = ["POST", "GET"])
 def login():
-    if request.method == "POST":
-        user = request.form["username"]
+    if request.method == 'POST':
+        auxUsername = request.form["username"]
         password = request.form["password"]
-        userQ = User.query.filter_by(username = user).first()
-        if type(userQ) is type(None):
-            return render_template("login.html")
-        if userQ.student_id == None:
-            nameQ = Teacher.query.filter_by(id = userQ.teacher_id).first()
-            return redirect(url_for("instructor", name = nameQ.name))
-        elif userQ.teacher_id == None:
-            nameQ = Student.query.filter_by(id = userQ.student_id).first()
-            return redirect(url_for("student", name = nameQ.name))
+
+        user = User.query.filter_by(username=auxUsername).first()
+
+        if user is None or not user.check_password(password):
+                return render_template("login.html")
+
+        login_user(user)
+
+        if user.student_id is None:
+            teacher = Teacher.query.filter_by(id=user.teacher_id).first()
+            return redirect(url_for('instructor', name = teacher.name))
+        else:
+            student = Student.query.filter_by(id=user.student_id).first()
+            return redirect(url_for('student', name=student.name))
+
     else:
+        if current_user.is_authenticated:
+            if current_user.student_id is None:
+                teacher = Teacher.query.filter_by(id=current_user.teacher_id).first()
+                return redirect(url_for('instructor', name = teacher.name))
+            else:
+                student = Student.query.filter_by(id=current_user.student_id).first()
+                return redirect(url_for('student', name=student.name))
+
         return render_template("login.html")
 
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+
 @app.route("/student/<name>")
+@login_required
 def student(name):
     student_name = name
     try_data = []
@@ -82,6 +139,7 @@ def student(name):
 
 
 @app.route("/instructor/<name>")
+@login_required
 def instructor(name):
     instructor_name = name
     tea_data = []
@@ -130,15 +188,6 @@ def instructor(name):
     #       return render_template("instructor.html", instructor_name = instructor_name, data = tea_data)
     # EDIT GRADES PAGE FOR INSTRUCTOR HERE (END) -------------------------------------------------------------------------------------------------------------------
 
-# USELESS CODE THUS FAR
-# @app.route("/index")
-# def index():
-#     return render_template("grade/index.html")
-
-# @app.route("/update")
-# def update():
-#     return render_template("grade/update.html")
-# USELESS CODE THUS FAR (END)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
