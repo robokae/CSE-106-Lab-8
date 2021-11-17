@@ -144,33 +144,60 @@ function getTable(nameOfTab, studentName) {
             for (let i = 0; i < enrolledData.length; i++) {
                 enrolledCourses.push(enrolledData[i].name);
             }
+
+            xhttp2.open(method, url2, async);
+
+            xhttp2.onload = function() {
+                coursesData = JSON.parse(this.response);
+                
+                let isEnrolled = false;
+                for (let i = 0; i < coursesData.length; i++) {
+                    for (let j = 0; j < enrolledCourses.length; j++) {
+                        if (coursesData[i].name === enrolledCourses[j]) {
+                            coursesData[i].enrolled = !isEnrolled;
+                            break;
+                        }
+                        else {
+                            coursesData[i].enrolled = isEnrolled;
+                        }
+
+                        
+                    }
+                }
+
+                generateTable(nameOfTab, coursesData, studentName);
+            }
+
+            xhttp2.send();
         };
 
         xhttp1.send();
 
-        xhttp2.open(method, url2, async);
+        // xhttp2.open(method, url2, async);
 
-        xhttp2.onload = function() {
-            coursesData = JSON.parse(this.response);
+        // xhttp2.onload = function() {
+        //     coursesData = JSON.parse(this.response);
             
-            let isEnrolled = false;
-            for (let i = 0; i < coursesData.length; i++) {
-                for (let j = 0; j < enrolledCourses.length; j++) {
-                    if (coursesData[i].name === enrolledCourses[j]) {
-                        coursesData[i].enrolled = !isEnrolled;
-                        break;
-                    }
-                    else {
-                        coursesData[i].enrolled = isEnrolled;
-                    }
+        //     console.log(coursesData);
+
+        //     let isEnrolled = false;
+        //     for (let i = 0; i < coursesData.length; i++) {
+        //         for (let j = 0; j < enrolledCourses.length; j++) {
+        //             if (coursesData[i].name === enrolledCourses[j]) {
+        //                 coursesData[i].enrolled = !isEnrolled;
+        //                 break;
+        //             }
+        //             else {
+        //                 coursesData[i].enrolled = isEnrolled;
+        //             }
 
                     
-                }
-            }
+        //         }
+        //     }
 
-            generateTable(nameOfTab, coursesData, studentName);
-        }
+        //     generateTable(nameOfTab, coursesData, studentName);
+        // }
 
-        xhttp2.send();
+        // xhttp2.send();
     }
 }
