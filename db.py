@@ -50,6 +50,9 @@ class Enrollment(db.Model):
 
 	student = db.relationship('Student', back_populates='courses')
 	course = db.relationship('Course', back_populates='students')
+	def __repr__(self):
+		return '<%r : %r>' % (self.course.course_name, self.student.name)
+
 
 	
 	
