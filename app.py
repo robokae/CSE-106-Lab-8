@@ -19,20 +19,20 @@ def login():
 
 @app.route("/student/<name>")
 def student(name):
-    sample_data = [
-        {
-            'name': 'BIO 1',
-            'instructor': 'John Smith',
-            'time': 'MWF 11:00am - 12:15pm',
-            'enrollment': '65/200'
-        },
-        {
-            'name': 'PHYS 10',
-            'instructor': 'Jane Doe',
-            'time': 'TR 5:00pm - 6:15pm',
-            'enrollment': '92/150'
-        }
-    ]
+    # sample_data = [
+    #     {
+    #         'name': 'BIO 1',
+    #         'instructor': 'John Smith',
+    #         'time': 'MWF 11:00am - 12:15pm',
+    #         'enrollment': '65/200'
+    #     },
+    #     {
+    #         'name': 'PHYS 10',
+    #         'instructor': 'Jane Doe',
+    #         'time': 'TR 5:00pm - 6:15pm',
+    #         'enrollment': '92/150'
+    #     }
+    # ]
     student_name = name
     try_data = []
     stuQ = Student.query.filter_by(name=student_name).first()
@@ -63,6 +63,17 @@ def instructor(name):
             'enrollment':(str(teaQC[i].number_enrolled) + "/" + str(teaQC[i].capacity))
         }
         tea_data.append(temp)
+    # tea_courses_data = {}
+    # for i in range(len(teaQC)):
+    #   courseT = []
+    #   for j in range(len(teaQC[i].students)):
+    #       temp1 = {
+    #           'student name':teaQC[i].students[j].student.name,
+    #           'grade':teaQC[i].students[j].grade
+    #       }
+    #       courseT.append(temp1)
+    #   tea_courses_data[teaQC[i].course_name] = courseT
+    # returnData = tea_course_data[courseName] <- this line of code would work off of the course clicked by the teacher, returning the table of students and grades pertaining to the course labeled courseName
     return render_template("instructor.html", instructor_name = instructor_name, data = tea_data)
 
 @app.route("/index")

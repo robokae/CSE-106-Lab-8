@@ -50,3 +50,11 @@ for i in range(len(teaAMC)):
 	print(teaAMC[i].course_name)
 	print(teaAMC[i].time)
 	print(str(teaAMC[i].number_enrolled) + "/" + str(teaAMC[i].capacity))
+print("")
+# print(teaAMC[0].students[0].student.name)
+for i in range(len(teaAMC)):
+	print(teaAMC[i].course_name)
+	for j in range(len(teaAMC[i].students)):
+		print(teaAMC[i].students[j].student.name)
+		print(teaAMC[i].students[j].grade)
+	print("")
