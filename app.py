@@ -42,68 +42,6 @@ def load_user(user_id):
     return User.query.get(user_id)
 
 
-  
-sample_enrolled_data = [
-    {
-        'name': 'BIO 1',
-        'instructor': 'John Smith',
-        'time': 'MWF 11:00am - 12:15pm',
-        'enrollment': '65/200'
-    },
-    {
-        'name': 'PHYS 10',
-        'instructor': 'Jane Doe',
-        'time': 'TR 5:00pm - 6:15pm',
-        'enrollment': '92/150'
-    }
-]
-
-
-sample_instructor_data = [
-    {
-        'name': 'BIO 1',
-        'instructor': 'John Smith',
-        'time': 'MWF 11:00am - 11:50am',
-        'enrollment': '65/200'
-    },
-    {
-        'name': 'BIO 10',
-        'instructor': 'John Smith',
-        'time': 'TR 12:00pm - 1:15pm',
-        'enrollment': '82/150'
-    },
-    {
-        'name': 'BIO 122',
-        'instructor': 'John Smith',
-        'time': 'MW 2:00pm - 3:15pm',
-        'enrollment': '102/120'
-    }
-]
-
-sample_instructor_course_data = [
-    {
-        'name': 'John Smith',
-        'grade': 93
-    },
-    {
-        'name': 'Alice Jones',
-        'grade': 94
-    },
-    {
-        'name': 'Mary Chen',
-        'grade': 95
-    },
-    {
-        'name': 'David',
-        'grade': 96
-    },
-    {
-        'name': 'Santosh',
-        'grade': 97
-    }
-]
-
-
 @app.route("/", methods = ["POST", "GET"])
 def login():
     if request.method == 'POST':
@@ -154,8 +92,6 @@ def student(name):
         stuQ = Student.query.filter_by(name=student_name).first()
         stuQC = stuQ.courses
 
-
-
         for i in range(len(stuQC)):
             temp = {
                 'name':stuQC[i].course.course_name,
@@ -187,16 +123,6 @@ def student(name):
             db.session.delete(enrollmentReq)
 
 
-        # Display all courses that the student is enrolled in 
-        # courseQ = Course.query.all()
-        # for i in range(len(courseQ)):
-        #     temp = {
-        #         'name':courseQ[i].course_name,
-        #         'instructor':courseQ[i].teacher.name,
-        #         'time':courseQ[i].time,
-        #         'enrollment':(str(courseQ[i].number_enrolled) + "/" + str(courseQ[i].capacity))
-        #     }
-        #     try_data.append(temp)
         db.session.commit()
     
     return render_template("student.html", student_name = student_name, data = try_data)
@@ -226,7 +152,7 @@ def specific_course(name, course, student = None):
     instructor_name = name
     instructor_course = course
 
-    tea_data = []
+    tea_course_data = []
     teaQ = Teacher.query.filter_by(name=instructor_name).first()
     teaQC = Course.query.filter_by(teacher_id = teaQ.id, course_name = instructor_course).first()
 
@@ -234,47 +160,25 @@ def specific_course(name, course, student = None):
 
     if request.method == 'GET':
         # Displays grades for a specific course
-        tea_courses_data = []
         for j in range(len(teaQC.students)):
             temp1 = {
                 'name':teaQC.students[j].student.name,
                 'grade':teaQC.students[j].grade
             }
-            tea_courses_data.append(temp1)
-        
-        #returnData = tea_course_data[courseName] #<- this line of code would work off of the course clicked by the teacher, returning the table of students and grades pertaining to the course labeled courseName
+            tea_course_data.append(temp1)
 
-    # if request.method == 'POST':
-    #     student_name = request.args.get('student')
-    #     for s in sample_instructor_course_data:
-    #         if s['name'] == student_name:
-    #             s['grade'] = request.form.get('new_grade')
+    if request.method == 'POST':
+        student_id = Student.query.filter_by(name = request.args.get('student')).first().id
+        course_id = Course.query.filter_by(course_name = instructor_course).first().id
 
-    return render_template("specificCourse.html", instructor_name = instructor_name, instructor_course = instructor_course, data = tea_courses_data)
+        Enrollment.query.filter_by(student_id = student_id, course_id = course_id).update({'grade': (request.form.get('new_grade'))})
+        db.session.commit()
+    
 
-  # EDIT GRADES PAGE FOR INSTRUCTOR HERE----------------------------------------------------------------------------------------------------------------------
-  # @app.route("/instructor/<name>/<course>")
-  # def instructorCourses(name, course):
-  #     instructor_name = name
-  #     teaQ = Teacher.query.filter_by(name=instructor_name).first()
-  #     teaQC = Course.query.filter_by(teacher_id = teaQ.id).all()
-  #     tea_courses_data = {}
-  #     for i in range(len(teaQC)):
-  #       courseT = []
-  #       for j in range(len(teaQC[i].students)):
-  #           temp1 = {
-  #               'student name':teaQC[i].students[j].student.name,
-  #               'grade':teaQC[i].students[j].grade
-  #           }
-  #           courseT.append(temp1)
-  #       tea_courses_data[teaQC[i].course_name] = courseT
-  #       returnData = tea_courses_data[course]
-  #       return render_template("instructor.html", instructor_name = instructor_name, data = tea_data)
-  # EDIT GRADES PAGE FOR INSTRUCTOR HERE (END) -------------------------------------------------------------------------------------------------------------------
+    return render_template("specificCourse.html", instructor_name = instructor_name, instructor_course = instructor_course, data = tea_course_data)
     
 
 @app.route("/enrolled/<name>")
-# @app.route("/student/<name>/enroll", methods = ["POST", "GET"])
 def enrolled(name, methods = ['POST', 'GET']):
     student_name = name
     try_data = []
