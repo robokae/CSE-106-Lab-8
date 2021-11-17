@@ -111,10 +111,17 @@ def instructor(name):
     instructor_name = name
     return render_template("instructor.html", instructor_name = instructor_name, data = sample_instructor_data)
 
-@app.route("/instructor/<name>/<course>")
-def specific_course(name, course):
+@app.route("/instructor/<name>/<course>", methods = ['GET', 'POST'])
+def specific_course(name, course, student = None):
     instructor_name = name
     instructor_course = course
+
+    if request.method == 'POST':
+        student_name = request.args.get('student')
+        print('student name is %s' % student_name)
+        for s in sample_instructor_course_data:
+            if s['name'] == student_name:
+                s['grade'] = request.form.get('new_grade')
 
     return render_template("specificCourse.html", instructor_name = instructor_name, instructor_course = instructor_course, data = sample_instructor_course_data)
 

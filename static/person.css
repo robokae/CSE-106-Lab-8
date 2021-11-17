@@ -100,6 +100,44 @@
     background-color: #EBF1F3;
 }
 
+.editable-grade:hover {
+    cursor: pointer;
+}
+
+.editable-field,
+.edit-grade-submit {
+    border: 1px solid #84878B;
+    border-radius: .25rem;
+    font-family: 'Source Sans Pro', Arial, Helvetica, sans-serif;
+    color: var(--primary-text-color);
+    display: inline-block;
+}
+
+.editable-field {
+    padding: .35rem;
+    width: 50px;
+}
+
+.editable-field:focus {
+    outline-color: var(--accent-color);
+}
+
+.grade-value {
+    display: inline-block;
+}
+
+.edit-grade-submit {
+    padding: .35rem .5rem;
+    margin-left: .5rem;
+}
+
+.edit-grade-submit:hover {
+    background-color: var(--accent-color);
+    color: var(--quaternary-text-color);
+    border: none;
+}
+
+
 
 
 

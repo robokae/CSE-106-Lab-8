@@ -11,7 +11,7 @@
 {% block person_name %}{{ instructor_name }}{% endblock %}
 
 {% block inner_nav_links %}
-    <p class="inner-nav-link active-tab">Your Courses</p>
+    <button class="inner-nav-link active-tab">Your Courses</button>
 {% endblock %}
 
 {% block data_table_headings %}
@@ -25,7 +25,9 @@
     {% for class in data %}
         <tr>
             <td>
-                <a href="{{ url_for('specific_course', name = class.instructor, course = class.name) }}">{{ class.name }}</a>
+                <a href="{{ url_for('specific_course', name = class.instructor, course = class.name) }}">
+                    {{ class.name }}
+                </a>
             </td>
             <td>{{ class.instructor }}</td>
             <td>{{ class.time }}</td>
