@@ -1,16 +1,26 @@
-let xhttp = new XMLHttpRequest();
 let method;
 let baseURL = "http://localhost:5000";
 let async = true;
 
 const tableHeadings = {
     enrolledTableHeadings: ["Name", "Instructor", "Time", "Enrollment"],
-    addTableHeadings: ["Option", "Name", "Instructor", "Time", "Enrollment"],
+    addTableHeadings: ["Add or Remove", "Name", "Instructor", "Time", "Enrollment"],
     instructorCoursesHeadings: ["Name", "Instructor", "Time", "Enrollment"],
     courseGradebookHeadings: ["Student", "Grade"]
 }
 
-function generateHTML(tableData, headings) {
+function updateCourseEnrollmentStatus(studentName, enrollOption, courseName) {
+    let xhttp3 = new XMLHttpRequest();
+
+    method = "POST";
+    let url = `${baseURL}/student/${studentName}`;
+
+    xhttp3.open(method, url, true);
+    xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp3.send(`course_name=${courseName}&enroll_option=${enrollOption}`);
+}
+
+function generateHTML(tableData, headings, studentName) {
     let headingsHTML = "";
     let tableBodyHTML = "";
     let tableRowLength;
@@ -24,7 +34,24 @@ function generateHTML(tableData, headings) {
 
         tableRowLength = Object.keys(tableData[j]).length;
 
-        for (let k = 0; k < tableRowLength; k++) {
+        let startingPosition = 0;
+
+        if (headings === tableHeadings.addTableHeadings) {
+            ++startingPosition;
+
+            let enrollOption = tableData[j].enrolled ? "Remove" : "Add";
+            let courseName = tableData[j].name;
+
+            tableBodyHTML += 
+                `<td>
+                    <button class="options-button" onclick="updateCourseEnrollmentStatus('${studentName}', '${enrollOption.toLowerCase()}', '${courseName}')">
+                        ${enrollOption}
+                    </button>
+                </td>`;
+        }
+
+        for (let k = startingPosition; k < tableRowLength; k++) {
+
             tableBodyHTML += `<td>${tableData[j][headings[k].toLowerCase()]}</td>`;
         }
 
@@ -37,18 +64,18 @@ function generateHTML(tableData, headings) {
     };
 }
 
-function generateTable(headingType, dataFromServer) {
+function generateTable(headingType, dataFromServer, studentName) {
     let headingsRow = document.querySelector(".headings-row");
     let tableBody = document.querySelector(".data-table-body");
 
-    let tableData = JSON.parse(dataFromServer);
+    let tableData = dataFromServer;
 
     switch (headingType) {
         case ("enrolled"):
-            tableHTML = generateHTML(tableData, tableHeadings.enrolledTableHeadings);
+            tableHTML = generateHTML(tableData, tableHeadings.enrolledTableHeadings, studentName);
             break;
         case ("add"):
-            tableHTML = generateHTML(tableData, tableHeadings.addTableHeadings);
+            tableHTML = generateHTML(tableData, tableHeadings.addTableHeadings, studentName);
             break;
     }
 
@@ -72,12 +99,14 @@ function getTable(nameOfTab, studentName) {
             addTab.classList.remove("active-tab");
         }
 
+        let xhttp = new XMLHttpRequest();
         method = "GET";
         let url = `${baseURL}/enrolled/${studentName}`;
         xhttp.open(method, url, async);
 
         xhttp.onload = function() {
-            generateTable(nameOfTab, this.response);
+            let enrolledData = JSON.parse(this.response);
+            generateTable(nameOfTab, enrolledData, studentName);
         };
         
         xhttp.send();
@@ -94,14 +123,54 @@ function getTable(nameOfTab, studentName) {
             enrolledTab.classList.remove("active-tab");
         }
 
-        method = "GET";
-        url = `${baseURL}/courses`;
-        xhttp.open(method, url, async);
+        let coursesData;
+        let enrolledData;
 
-        xhttp.onload = function() {
-            generateTable(nameOfTab, this.response);
+        let xhttp1 = new XMLHttpRequest();
+        let xhttp2 = new XMLHttpRequest();
+
+        method = "GET";
+        
+        let url1 = `${baseURL}/enrolled/${studentName}`;
+        let url2 = `${baseURL}/courses`;
+
+        xhttp1.open(method, url1, async);
+
+        let enrolledCourses = [];
+
+        xhttp1.onload = function() {
+            enrolledData = JSON.parse(this.response);
+
+            for (let i = 0; i < enrolledData.length; i++) {
+                enrolledCourses.push(enrolledData[i].name);
+            }
         };
 
-        xhttp.send();
+        xhttp1.send();
+
+        xhttp2.open(method, url2, async);
+
+        xhttp2.onload = function() {
+            coursesData = JSON.parse(this.response);
+            
+            let isEnrolled = false;
+            for (let i = 0; i < coursesData.length; i++) {
+                for (let j = 0; j < enrolledCourses.length; j++) {
+                    if (coursesData[i].name === enrolledCourses[j]) {
+                        coursesData[i].enrolled = !isEnrolled;
+                        break;
+                    }
+                    else {
+                        coursesData[i].enrolled = isEnrolled;
+                    }
+
+                    
+                }
+            }
+
+            generateTable(nameOfTab, coursesData, studentName);
+        }
+
+        xhttp2.send();
     }
 }

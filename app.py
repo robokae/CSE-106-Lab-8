@@ -24,28 +24,28 @@ sample_enrolled_data = [
 
 sample_courses_data = [
     {
-        'option': 'Remove',
+        # 'option': 'Remove',
         'name': 'BIO 1',
         'instructor': 'John Smith',
         'time': 'MWF 11:00am - 12:15pm',
         'enrollment': '65/200'
     },
     {
-        'option': 'Add',
+        # 'option': 'Add',
         'name': 'BIO 10',
         'instructor': 'John Smith',
         'time': 'TR 12:00pm - 1:15pm',
         'enrollment': '82/150'
     },
     {
-        'option': 'Add',
+        # 'option': 'Add',
         'name': 'BIO 122',
         'instructor': 'John Smith',
         'time': 'MW 2:00pm - 3:15pm',
         'enrollment': '102/120'
     },
     {
-        'option': 'Remove',
+        # 'option': 'Remove',
         'name': 'PHYS 10',
         'instructor': 'Jane Doe',
         'time': 'TR 5:00pm - 6:15pm',
@@ -101,9 +101,26 @@ sample_instructor_course_data = [
 def login():
     return render_template("login.html")
 
-@app.route("/student/<name>")
+@app.route("/student/<name>", methods = ['GET', 'POST'])
 def student(name):
     student_name = name
+
+    if request.method == 'POST':
+        course_name = request.form.get('course_name')
+        enroll_option = request.form.get('enroll_option')
+
+        if enroll_option == 'add':
+            for i in range(len(sample_courses_data)):
+                if sample_courses_data[i]['name'] == course_name:
+                    course_to_add = sample_courses_data[i]
+            sample_enrolled_data.append(course_to_add)
+            
+        elif enroll_option == 'remove':
+            for j in range(len(sample_enrolled_data)):
+                if sample_enrolled_data[j]['name'] == course_name:
+                    del sample_enrolled_data[j]
+                    break
+
     return render_template("student.html", student_name = student_name)
 
 @app.route("/instructor/<name>")
@@ -118,7 +135,6 @@ def specific_course(name, course, student = None):
 
     if request.method == 'POST':
         student_name = request.args.get('student')
-        print('student name is %s' % student_name)
         for s in sample_instructor_course_data:
             if s['name'] == student_name:
                 s['grade'] = request.form.get('new_grade')

@@ -11,11 +11,14 @@
 }
 
 .person-container-top {
-    height: auto;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+}
+
+.person-container-middle {
+    min-height: 5rem;
 }
 
 .search-bar {
@@ -105,7 +108,8 @@
 }
 
 .editable-field,
-.edit-grade-submit {
+.edit-grade-submit,
+.options-button {
     border: 1px solid #84878B;
     border-radius: .25rem;
     font-family: 'Source Sans Pro', Arial, Helvetica, sans-serif;
@@ -131,11 +135,17 @@
     margin-left: .5rem;
 }
 
-.edit-grade-submit:hover {
-    background-color: var(--accent-color);
-    color: var(--quaternary-text-color);
-    border: none;
+.options-button {
+    width: 75px;
+    padding: .35rem;
 }
+
+.edit-grade-submit:hover,
+.options-button:hover {
+    cursor: pointer;
+}
+
+
 
 
 
