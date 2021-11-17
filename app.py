@@ -2,16 +2,14 @@
 from flask import Flask, render_template, request, url_for, redirect
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-from flask_login import LoginManager, current_user, login_user
-from db import User, Teacher, Student, Course, Enrollment, db
-
-# from flask_admin import Admin, AdminIndexView
-# from flask_login import LoginManager, current_user, login_user, logout_user
-# from flask_login.utils import login_required
-# from flask_sqlalchemy.model import Model
-# from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, current_user, login_user, login_required
+from flask_sqlalchemy import SQLAlchemy
+from db import User, Teacher, Student, Course, Enrollment
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///example.sqlite"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+db = SQLAlchemy(app)
 
 # -------- Admin ----------
 admin = Admin(app)
@@ -35,60 +33,40 @@ app.config['SECRET_KEY'] = 'testkey'
 @login.user_loader
 def load_user(user_id):
     return User.get_id(user_id)
-# -------------------------
+
 
 # @app.route("/")
 # def base():
 #     return render_template("base.html")
 
-# -------- Admin ----------
-# class UserView(ModelView):
-#     def is_accessible(self):
-#         return True
-
-# class TeacherView(ModelView):
-#     def is_accessible(self):
-#         return True
-
-# class StudentView(ModelView):
-#     def is_accessible(self):
-#         return True
-
-# class CourseView(ModelView):
-#     def is_accessible(self):
-#         return True
-
-# class EnrollmentView(ModelView):
-#     def is_accessible(self):
-#         return True
-
-# --------------------------
-
 
 @app.route("/", methods = ["POST", "GET"])
 def login():
+    if request.method == 'POST':
+    # if current_user.is_authenticated:
+    #     if current_user.student_id is None:
+    #         return redirect(url_for('instructor'))
+    #     else:
+    #         return redirect(url_for('student'))
 
-        if request.method == 'POST':
-        # if current_user.is_authenticated:
-        #     if current_user.student_id is None:
-        #         return redirect(url_for('instructor'))
-        #     else:
-        #         return redirect(url_for('student'))
+        username = request.form["username"]
+        password = request.form["password"]
 
-            username = request.form["username"]
-            password = request.form["password"]
+        user = User.query.filter_by(username=username).first()
 
-            user = User.query.filter_by(username=username).first()
+        if not user is None or not user.check_password(password):
+                return redirect(url_for('login'))
 
-            if not user is None or not user.check_password(password):
-                    return redirect(url_for('login'))
+        login_user(user)
 
-            login_user(user)
-
-            if user.student_id is None:
-                redirect(url_for('instructor'))
-            else:
-                redirect(url_for('student'))
+        if user.student_id is None:
+            teacher = Teacher.query.filter_by(id=user.teacher_id).first()
+            return redirect(url_for('instructor', name = teacher.name))
+        else:
+            student = Student.query.filter_by(id=user.student_id).first()
+            return redirect(url_for('student', name=student.name))
+    else:
+        return render_template("login.html")
 
 
 # @app.route('/logout')
@@ -97,7 +75,7 @@ def login():
 
 
 @app.route("/student/<name>")
-# @login_required
+@login_required
 def student(name):
     sample_data = [
         {
@@ -117,18 +95,18 @@ def student(name):
     return render_template("student.html", student_name = student_name, data = sample_data)
 
 @app.route("/instructor/<name>")
-# @login_required
+@login_required
 def instructor(name):
     instructor_name = name
     return render_template("instructor.html", instructor_name = instructor_name)
 
-@app.route("/index")
-def index():
-    return render_template("index.html")
+# @app.route("/index")
+# def index():
+#     return render_template("index.html")
 
-@app.route("/update")
-def update():
-    return render_template("update.html")
+# @app.route("/update")
+# def update():
+#     return render_template("update.html")
 
 if __name__ == "__main__":
     app.run(debug=True)

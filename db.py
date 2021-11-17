@@ -1,24 +1,18 @@
 # Database code
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-# from flask_login import UserMixin
-
-# UserMixin = methods that are needed for flask login
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///example.sqlite"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
-# class User(UserMixin, db.Model):
 class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String(15), unique=True, nullable=False)
 	password = db.Column(db.String, nullable=False)
 	student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
 	teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'))
-	def check_password(self, password):
-		return self.password == password
 
 
 class Teacher(db.Model):
@@ -56,6 +50,9 @@ class Enrollment(db.Model):
 
 	student = db.relationship('Student', back_populates='courses')
 	course = db.relationship('Course', back_populates='students')
+	def __repr__(self):
+		return '<%r : %r>' % (self.course.course_name, self.student.name)
+
 
 	
 	
