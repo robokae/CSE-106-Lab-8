@@ -1,28 +1,32 @@
 # Database code
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///example.sqlite"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
-class User(db.Model):
+class User(UserMixin, db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String(15), unique=True, nullable=False)
 	password = db.Column(db.String, nullable=False)
 	student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
 	teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'))
 
+	def check_password(self, password):
+		return self.password == password
 
-class Teacher(db.Model):
+
+class Teacher(db.Model, UserMixin):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String, nullable=False)
 	
 	user = db.relationship('User', backref='teacher', uselist=False)
 
 
-class Student(db.Model):
+class Student(db.Model, UserMixin):
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	name = db.Column(db.String, nullable=False)
 
@@ -30,7 +34,7 @@ class Student(db.Model):
 	courses = db.relationship('Enrollment', back_populates='student')
 
 
-class Course(db.Model):
+class Course(db.Model, UserMixin):
 	id = db.Column(db.Integer, primary_key=True)
 	course_name = db.Column(db.String, unique=True, nullable=False)
 	teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'), nullable=False)
@@ -42,7 +46,7 @@ class Course(db.Model):
 	students = db.relationship('Enrollment', back_populates='course')
 
 
-class Enrollment(db.Model):
+class Enrollment(db.Model, UserMixin):
 	id = db.Column(db.Integer, primary_key=True)
 	student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
 	course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)

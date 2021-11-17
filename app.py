@@ -2,7 +2,7 @@
 from flask import Flask, render_template, request, url_for, redirect
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-from flask_login import LoginManager, current_user, login_user, login_required
+from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from db import User, Teacher, Student, Course, Enrollment
 
@@ -32,7 +32,7 @@ app.config['SECRET_KEY'] = 'testkey'
 
 @login.user_loader
 def load_user(user_id):
-    return User.get_id(user_id)
+    return User.query.get(user_id)
 
 
 # @app.route("/")
@@ -43,19 +43,13 @@ def load_user(user_id):
 @app.route("/", methods = ["POST", "GET"])
 def login():
     if request.method == 'POST':
-    # if current_user.is_authenticated:
-    #     if current_user.student_id is None:
-    #         return redirect(url_for('instructor'))
-    #     else:
-    #         return redirect(url_for('student'))
-
-        username = request.form["username"]
+        auxUsername = request.form["username"]
         password = request.form["password"]
 
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(username=auxUsername).first()
 
-        if not user is None or not user.check_password(password):
-                return redirect(url_for('login'))
+        if user is None or not user.check_password(password):
+                return render_template("login.html")
 
         login_user(user)
 
@@ -66,12 +60,22 @@ def login():
             student = Student.query.filter_by(id=user.student_id).first()
             return redirect(url_for('student', name=student.name))
     else:
+        if current_user.is_authenticated:
+            if current_user.student_id is None:
+                teacher = Teacher.query.filter_by(id=current_user.teacher_id).first()
+                return redirect(url_for('instructor', name = teacher.name))
+            else:
+                student = Student.query.filter_by(id=current_user.student_id).first()
+                return redirect(url_for('student', name=student.name))
+
         return render_template("login.html")
 
 
-# @app.route('/logout')
-# def logout():
-#     logout_user
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 
 @app.route("/student/<name>")
