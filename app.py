@@ -52,7 +52,18 @@ def student(name):
 @app.route("/instructor/<name>")
 def instructor(name):
     instructor_name = name
-    return render_template("instructor.html", instructor_name = instructor_name)
+    tea_data = []
+    teaQ = Teacher.query.filter_by(name=instructor_name).first()
+    teaQC = Course.query.filter_by(teacher_id = teaQ.id).all()
+    for i in range(len(teaQC)):
+        temp = {
+            'name':teaQC[i].course_name,
+            'instructor':instructor_name,
+            'time':teaQC[i].time,
+            'enrollment':(str(teaQC[i].number_enrolled) + "/" + str(teaQC[i].capacity))
+        }
+        tea_data.append(temp)
+    return render_template("instructor.html", instructor_name = instructor_name, data = tea_data)
 
 @app.route("/index")
 def index():

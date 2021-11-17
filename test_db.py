@@ -40,3 +40,13 @@ for i in range(len(stuC)):
 	print(stuC[i].course.teacher.name)
 	print(str(stuC[i].course.number_enrolled) + "/" + str(stuC[i].course.capacity))
 	print("")
+
+namTea = "Ammon Hepworth"
+teaAm = Teacher.query.filter_by(name=namTea).first()
+print(teaAm.name)
+print("")
+teaAMC = Course.query.filter_by(teacher_id = teaAm.id).all()
+for i in range(len(teaAMC)):
+	print(teaAMC[i].course_name)
+	print(teaAMC[i].time)
+	print(str(teaAMC[i].number_enrolled) + "/" + str(teaAMC[i].capacity))
