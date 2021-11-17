@@ -11,24 +11,28 @@
 {% block person_name %}{{ instructor_name }}{% endblock %}
 
 {% block inner_nav_links %}
-    <button class="inner-nav-link active-link">Your Courses</button>
+    <button class="inner-nav-link active-tab">Your Courses</button>
 {% endblock %}
 
-<!------------------------------------Testing output for the instructor view---------------------------------------------->
-<!-- {% block table_headings %}
+{% block data_table_headings %}
     <th>Name</th>
     <th>Instructor</th>
     <th>Time</th>
-    <th>Students Enrolled</th>
+    <th>Enrollment</th>
 {% endblock %}
 
-{% block rows %} 
+{% block data_table_body %}
     {% for class in data %}
-        <tr class="data-table-row">
-            <td>{{ class.name }}</td>
+        <tr>
+            <td>
+                <a href="{{ url_for('specific_course', name = class.instructor, course = class.name) }}">
+                    {{ class.name }}
+                </a>
+            </td>
             <td>{{ class.instructor }}</td>
             <td>{{ class.time }}</td>
             <td>{{ class.enrollment }}</td>
         </tr>
     {% endfor %}
-{% endblock %}  -->
+{% endblock %}
+

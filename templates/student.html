@@ -11,24 +11,14 @@
 {% block person_name %}{{ student_name }}{% endblock %}
 
 {% block inner_nav_links %}
-    <button class="inner-nav-link active-link">Enrolled Courses</button>
-    <button class="inner-nav-link">Add Course</button>
+    <button class="inner-nav-link enrolled-tab" onclick="getTable('enrolled', '{{ student_name }}')">Enrolled Courses</button>
+   
+    <button class="inner-nav-link add-tab" onclick="getTable('add', '{{ student_name }}')">Add Courses</button>
 {% endblock %}
 
-{% block table_headings %}
-    <th>Name</th>
-    <th>Instructor</th>
-    <th>Time</th>
-    <th>Students Enrolled</th>
+{% block additional_scripts %}
+    <script>
+        window.onload = getTable('enrolled', '{{ student_name }}');
+    </script>
 {% endblock %}
 
-{% block rows %} 
-    {% for class in data %}
-        <tr class="data-table-row">
-            <td>{{ class.name }}</td>
-            <td>{{ class.instructor }}</td>
-            <td>{{ class.time }}</td>
-            <td>{{ class.enrollment }}</td>
-        </tr>
-    {% endfor %}
-{% endblock %} 
