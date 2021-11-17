@@ -58,3 +58,9 @@ for i in range(len(teaAMC)):
 		print(teaAMC[i].students[j].student.name)
 		print(teaAMC[i].students[j].grade)
 	print("")
+
+userName = "ahepworth"
+userNameQ = User.query.filter_by(username = userName).first()
+print(userNameQ.teacher_id)
+teachAm = Teacher.query.filter_by(id = userNameQ.teacher_id).first()
+print(teachAm.name)
