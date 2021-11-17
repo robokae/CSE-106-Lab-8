@@ -128,7 +128,7 @@ def student(name):
 
 
 @app.route("/instructor/<name>")
-@login_required
+# @login_required
 def instructor(name):
     instructor_name = name
     
@@ -172,6 +172,13 @@ def specific_course(name, course, student = None):
 
         Enrollment.query.filter_by(student_id = student_id, course_id = course_id).update({'grade': (request.form.get('new_grade'))})
         db.session.commit()
+
+        for j in range(len(teaQC.students)):
+            temp1 = {
+                'name':teaQC.students[j].student.name,
+                'grade':teaQC.students[j].grade
+            }
+            tea_course_data.append(temp1)
     
 
     return render_template("specificCourse.html", instructor_name = instructor_name, instructor_course = instructor_course, data = tea_course_data)
