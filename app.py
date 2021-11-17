@@ -8,17 +8,22 @@ from flask_sqlalchemy import SQLAlchemy
 from db import User, Teacher, Student, Course, Enrollment
 
 app = Flask(__name__)
-cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+
+# SQLAlchemy config
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///example.sqlite"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+
+# Flask Admin
+app.config['FLASK_ADMIN_SWATCH'] = 'Cyborg'
+app.config['SECRET_KEY'] = 'testkey'
+
 db = SQLAlchemy(app)
+admin = Admin(app)
+login = LoginManager(app)
+cors = CORS(app)
 
 # -------- Admin ----------
-admin = Admin(app)
-
-app.config['FLASK_ADMIN_SWATCH'] = 'Cyborg'
-
 admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Teacher, db.session))
 admin.add_view(ModelView(Student, db.session))
@@ -28,14 +33,12 @@ admin.add_view(ModelView(Enrollment, db.session))
 # -------- Login ----------
 # LoginManager = instance of login
 
-login = LoginManager(app)
 login.login_view = 'login'
-
-app.config['SECRET_KEY'] = 'testkey'
 
 @login.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
+
 
   
 sample_enrolled_data = [
@@ -167,77 +170,69 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route("/student/<name>", methods = ['GET', 'POST'])
+@app.route("/student/<name>", methods = ['POST', 'GET'])
 @login_required
 def student(name):
     student_name = name
+
     try_data = []
-    stuQ = Student.query.filter_by(name=student_name).first()
-    stuQC = stuQ.courses
-    for i in range(len(stuQC)):
-        temp = {
-            'name':stuQC[i].course.course_name,
-            'instructor':stuQC[i].course.teacher.name,
-            'time':stuQC[i].course.time,
-            'enrollment':(str(stuQC[i].course.number_enrolled) + "/" + str(stuQC[i].course.capacity))
-        }
-        try_data.append(temp)
         
-    if request.method == 'POST':
-      course_name = request.form.get('course_name')
-      enroll_option = request.form.get('enroll_option')
+    print(request.form.get('course_name'))
+    # get all courses the student is enrolled in
+    if request.method == 'GET':
+        stuQ = Student.query.filter_by(name=student_name).first()
+        stuQC = stuQ.courses
 
-      if enroll_option == 'add':
-          for i in range(len(sample_courses_data)):
-              if sample_courses_data[i]['name'] == course_name:
-                  course_to_add = sample_courses_data[i]
-          sample_enrolled_data.append(course_to_add)
+        for i in range(len(stuQC)):
+            temp = {
+                'name':stuQC[i].course.course_name,
+                'instructor':stuQC[i].course.teacher.name,
+                'time':stuQC[i].course.time,
+                'enrollment':(str(stuQC[i].course.number_enrolled) + "/" + str(stuQC[i].course.capacity))
+            }
+            try_data.append(temp)
+        
+    # add or remove a course
+    
 
-      elif enroll_option == 'remove':
-          for j in range(len(sample_enrolled_data)):
-              if sample_enrolled_data[j]['name'] == course_name:
-                  del sample_enrolled_data[j]
-                  break
+    elif request.method == 'POST': 
+        course_name = request.form.get('course_name')
+        enroll_option = request.form.get('enroll_option')
 
+        print(course_name)
+        print(enroll_option)
 
-    # CODE TO DISPLAY ALL COURSES 
-    # courseQ = Course.query.all()
-    # for i in range(len(courseQ)):
-    #     temp = {
-    #         'name':courseQ[i].course_name,
-    #         'instructor':courseQ[i].teacher.name,
-    #         'time':courseQ[i].time,
-    #         'enrollment':(str(courseQ[i].number_enrolled) + "/" + str(courseQ[i].capacity))
-    #     }
-    #     try_data.append(temp)
-    # # CODE TO DISPLAY ALL COURSES (END)
+        # if enroll_option == 'add':
+        #     stuQ = Student.query.filter_by(name=student_name).first()
+        #     courseReqNm = course_name
+        #     courseReq = Course.query.filter_by(course_name = courseReqNm).first()
+        #     newCourseStu = Enrollment(student_id = stuQ.id, course_id = courseReq.id, grade = "")
+        #     db.session.add(newCourseStu)
+        #     db.session.commit()
+
+        #     # for i in range(len(sample_courses_data)):
+        #     #     if sample_courses_data[i]['name'] == course_name:
+        #     #         course_to_add = sample_courses_data[i]
+        #     # sample_enrolled_data.append(course_to_add)
+
+        # elif enroll_option == 'remove':
+        #     for j in range(len(sample_enrolled_data)):
+        #         if sample_enrolled_data[j]['name'] == course_name:
+        #             del sample_enrolled_data[j]
+        #             break
+
+        # Display all courses that the student is enrolled in 
+        # courseQ = Course.query.all()
+        # for i in range(len(courseQ)):
+        #     temp = {
+        #         'name':courseQ[i].course_name,
+        #         'instructor':courseQ[i].teacher.name,
+        #         'time':courseQ[i].time,
+        #         'enrollment':(str(courseQ[i].number_enrolled) + "/" + str(courseQ[i].capacity))
+        #     }
+        #     try_data.append(temp)
     
     return render_template("student.html", student_name = student_name, data = try_data)
-
-    # ENROLL APP ROUTE HERE (Includes the DISPLAY ALL COURSES functionality for add and drop purposes)-------------------------------------------------------------------------------------
-    # @app.route("/student/<name>/enroll", methods = ["POST", "GET"])
-    # def enroll(name):
-    #     student_name = name
-    #     try_data = []
-    #     if request.method == "GET":
-    #         courseQ = Course.query.all()
-    #         for i in range(len(courseQ)):
-    #             temp = {
-    #                 'name':courseQ[i].course_name,
-    #                 'instructor':courseQ[i].teacher.name,
-    #                 'time':courseQ[i].time,
-    #                 'enrollment':(str(courseQ[i].number_enrolled) + "/" + str(courseQ[i].capacity))
-    #             }
-    #             try_data.append(temp)
-    #     elif request.method == "POST":
-    #         stuQ = Student.query.filter_by(name=student_name).first()
-    #         courseReqNm = ""
-    #         courseReq = Course.query.filter_by(course_name = courseReqNm).first()
-    #         newCourseStu = Enrollment(student_id = stuQ.id, course_id = courseReq.id, grade = "")
-    #         db.session.add(newCourseStu)
-    #         db.session.commit()
-    #     return jsonify(try_data)
-    # ENROLL APP ROUTE HERE (END)----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 @app.route("/instructor/<name>")
@@ -305,14 +300,41 @@ def specific_course(name, course, student = None):
   #       return render_template("instructor.html", instructor_name = instructor_name, data = tea_data)
   # EDIT GRADES PAGE FOR INSTRUCTOR HERE (END) -------------------------------------------------------------------------------------------------------------------
     
+# ENROLL APP ROUTE HERE (Includes the DISPLAY ALL COURSES functionality for add and drop purposes)-------------------------------------------------------------------------------------
 @app.route("/enrolled/<name>")
-def enrolled(name):
-    # return array of json
-    return jsonify(sample_enrolled_data)
+# @app.route("/student/<name>/enroll", methods = ["POST", "GET"])
+def enrolled(name, methods = ['POST', 'GET']):
+    student_name = name
+    try_data = []
+    if request.method == 'GET':
+        stuQ = Student.query.filter_by(name=student_name).first()
+        stuQC = stuQ.courses
+
+        for i in range(len(stuQC)):
+            temp = {
+                'name':stuQC[i].course.course_name,
+                'instructor':stuQC[i].course.teacher.name,
+                'time':stuQC[i].course.time,
+                'enrollment':(str(stuQC[i].course.number_enrolled) + "/" + str(stuQC[i].course.capacity))
+            }
+            try_data.append(temp)
+    
+    return jsonify(try_data)
+    # ENROLL APP ROUTE HERE (END)----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @app.route("/courses")
 def courses():
-    return jsonify(sample_courses_data)
+    try_data = []
+    courseQ = Course.query.all()
+    for i in range(len(courseQ)):
+        temp = {
+            'name':courseQ[i].course_name,
+            'instructor':courseQ[i].teacher.name,
+            'time':courseQ[i].time,
+            'enrollment':(str(courseQ[i].number_enrolled) + "/" + str(courseQ[i].capacity))
+        }
+        try_data.append(temp)
+    return jsonify(try_data)
 
 if __name__ == "__main__":
     app.run(debug=True)
