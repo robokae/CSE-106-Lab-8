@@ -1,6 +1,6 @@
-# CSE 106 Lab 8
+# Gradebook Application
 
-Gradebook web application with create, read, update, and delete (CRUD) features. Created using HTML, CSS, JavaScript, and Flask.
+Gradebook web application for CSE 106. Created using HTML, CSS, JavaScript, and Flask. 
 
 ## Features
 * Login page
@@ -23,8 +23,8 @@ In order to run the web application, make sure to have the following installed:
 To run the application, execute the following commands in the command line:
 ```bash
 # Clone the repository and access it
-git clone https://github.com/robokae/CSE-106-Lab-8.git
-cd CSE-106-Lab-8
+git clone https://github.com/robokae/Gradebook-Application.git
+cd Gradebook-Application
 
 # Create a Python virtual environment
 python3 -m venv venv
